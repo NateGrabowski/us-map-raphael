@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>US Map with Proper State Labels</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    
+    #map-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    /* State boundary styling */
+    .boundary {
+      fill: #d3d3d3;
+      stroke: #ffffff;
+      stroke-width: 1.25;
+      stroke-miterlimit: 4;
+      stroke-opacity: 1;
+      cursor: pointer;
+      transition: fill 0.3s ease;
+    }
+    
+    .boundary:hover {
+      fill: #999999;
+    }
+    
+    /* State label styling */
+    text {
+      fill: #ffffff;
+      font-size: 21px;
+      font-family: 'Trebuchet MS', Helvetica, sans-serif;
+      pointer-events: none;
+      user-select: none;
+    }
+    
+    /* Ensure text positioning matches SVG exactly */
+    text tspan {
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    
+    /* Label line styling */
+    .label-line {
+      fill: none;
+      stroke: #b9b9b9;
+      stroke-width: 1;
+      pointer-events: none;
+    }
+    
+    /* Label background rectangles */
+    rect {
+      fill: rgba(0, 0, 0, 0.8);
+      stroke: #b9b9b9;
+      stroke-width: 1;
+      pointer-events: none;
+      rx: 5;
+      ry: 5;
+    }
+    
+    /* Additional styling for better visual hierarchy */
+    svg {
+      width: 100%;
+      height: auto;
+      background: #f8f9fa;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .state-group {
+      transition: all 0.3s ease;
+    }
+    
+    .state-group:hover text {
+      font-weight: bold;
+      filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
+    }
+  </style>
+</head>
+<body>
+  <div id="map-container">
+    <!-- We'll load the SVG content here -->
+  </div>
+
+  <script>
+    // Load the SVG content
+    fetch('../labels_us_map.svg')
+      .then(response => response.text())
+      .then(svgContent => {
+        // Insert SVG into the container
+        document.getElementById('map-container').innerHTML = svgContent;
+        
+        // Add interactivity to the map
+        addMapInteractivity();
+      })
+      .catch(error => {
+        console.error('Error loading SVG:', error);
+        // Fallback: embed the SVG content directly
+        loadFallbackSVG();
+      });
+
+    function addMapInteractivity() {
+      // Get all state boundary paths
+      const states = document.querySelectorAll('.boundary');
+      
+      // Ensure proper text centering
+      enhanceTextCentering();
+      
+      // Add state-group class to all state groups
+      const stateGroups = document.querySelectorAll('g[id]');
+      stateGroups.forEach(group => {
+        if (group.id && group.id.length <= 2) { // State abbreviations are 2 letters or less
+          group.classList.add('state-group');
+        }
+      });
+      
+      states.forEach(state => {
+        // Generate random color for each state
+        const randomColor = getRandomColor();
+        
+        // Add hover effects
+        state.addEventListener('mouseenter', function() {
+          this.style.fill = randomColor;
+          this.style.transform = 'scale(1.02)';
+          this.style.transformOrigin = 'center';
+          this.style.filter = 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))';
+        });
+        
+        state.addEventListener('mouseleave', function() {
+          this.style.fill = '#d3d3d3';
+          this.style.transform = 'scale(1)';
+          this.style.filter = 'none';
+        });
+        
+        // Add click handler
+        state.addEventListener('click', function() {
+          const stateId = this.closest('g').id;
+          alert(`You clicked on ${stateId}`);
+        });
+      });
+    }
+    
+    function enhanceTextCentering() {
+      // Get all text elements and ensure they're properly centered
+      const textElements = document.querySelectorAll('text');
+      
+      textElements.forEach(textEl => {
+        const parent = textEl.closest('g');
+        const rect = parent ? parent.querySelector('rect') : null;
+        
+        if (rect) {
+          // For states with background rectangles (small states with leader lines)
+          const rectX = parseFloat(rect.getAttribute('x'));
+          const rectWidth = parseFloat(rect.getAttribute('width'));
+          const rectY = parseFloat(rect.getAttribute('y'));
+          const rectHeight = parseFloat(rect.getAttribute('height'));
+          
+          // Center text within rectangle
+          const centerX = rectX + rectWidth / 2;
+          const centerY = rectY + rectHeight / 2;
+          
+          textEl.setAttribute('x', centerX);
+          textEl.setAttribute('y', centerY);
+          textEl.setAttribute('text-anchor', 'middle');
+          textEl.setAttribute('dominant-baseline', 'central');
+        } else {
+          // For states without rectangles, ensure centering attributes are set
+          textEl.setAttribute('text-anchor', 'middle');
+          textEl.setAttribute('dominant-baseline', 'central');
+        }
+        
+        // Apply centering to tspan elements as well
+        const tspans = textEl.querySelectorAll('tspan');
+        tspans.forEach(tspan => {
+          tspan.setAttribute('text-anchor', 'middle');
+          tspan.setAttribute('dominant-baseline', 'central');
+        });
+      });
+    }
+    
+    function getRandomColor() {
+      const colors = [
+        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+        '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+        '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#F4D03F'
+      ];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+    
+    function loadFallbackSVG() {
+      // Fallback implementation if fetch fails
+      document.getElementById('map-container').innerHTML = `
+        <p>Please ensure the labels_us_map.svg file is accessible.</p>
+        <p>You can view the interactive map by placing this HTML file in the same directory as the SVG.</p>
+      `;
+    }
+  </script>
+</body>
+</html>
