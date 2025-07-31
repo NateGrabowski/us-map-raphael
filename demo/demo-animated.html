@@ -30,6 +30,21 @@
       usRaphael[state] = R.path(usMap[state]).attr(attr);
     }
     
+    //Add state labels
+    for (var state in usRaphael) {
+      var bbox = usRaphael[state].getBBox();
+      var centerX = bbox.x + bbox.width / 2;
+      var centerY = bbox.y + bbox.height / 2;
+      
+      R.text(centerX, centerY, state.toUpperCase()).attr({
+        "fill": "#000", // black
+        "font-size": "8px",
+        "text-anchor": "middle",
+        "dominant-baseline": "central",
+        "pointer-events": "none"
+      });
+    }
+    
     //Do Work on Map
     for (var state in usRaphael) {
       usRaphael[state].color = Raphael.getColor();
