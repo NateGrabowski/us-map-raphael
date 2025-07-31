@@ -17,7 +17,6 @@
     
     /* State boundary styling */
     .boundary {
-      fill: #d3d3d3;
       stroke: #ffffff;
       stroke-width: 1.25;
       stroke-miterlimit: 4;
@@ -111,7 +110,7 @@
       // Ensure proper text centering
       enhanceTextCentering();
       
-      // Add state-group class to all state groups
+      // Add state-group class to all state groups and apply regional colors
       const stateGroups = document.querySelectorAll('g[id]');
       stateGroups.forEach(group => {
         if (group.id && group.id.length <= 2) { // State abbreviations are 2 letters or less
@@ -120,19 +119,23 @@
       });
       
       states.forEach(state => {
-        // Generate random color for each state
-        const randomColor = getRandomColor();
+        const stateId = state.closest('g').id;
+        const regionalColor = getRegionalColor(stateId);
+        const hoverColor = getHoverColor(stateId);
+        
+        // Apply regional color immediately
+        state.style.fill = regionalColor;
         
         // Add hover effects
         state.addEventListener('mouseenter', function() {
-          this.style.fill = randomColor;
+          this.style.fill = hoverColor;
           this.style.transform = 'scale(1.02)';
           this.style.transformOrigin = 'center';
           this.style.filter = 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))';
         });
         
         state.addEventListener('mouseleave', function() {
-          this.style.fill = '#d3d3d3';
+          this.style.fill = regionalColor;
           this.style.transform = 'scale(1)';
           this.style.filter = 'none';
         });
@@ -183,13 +186,67 @@
       });
     }
     
-    function getRandomColor() {
-      const colors = [
-        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-        '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-        '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#F4D03F'
-      ];
-      return colors[Math.floor(Math.random() * colors.length)];
+    function getRegionalColor(stateId) {
+      // Regional color mapping based on the provided image
+      const regions = {
+        // Dark Blue/Navy - Northeast
+        northeast: ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA', 'DE', 'MD'],
+        // Red - Southeast/Great Lakes
+        southeast: ['VA', 'WV', 'KY', 'TN', 'NC', 'SC', 'OH', 'IN', 'IL', 'MI', 'WI'],
+        // Teal/Dark Green - South Central
+        southcentral: ['TX', 'AR', 'LA', 'OK', 'MO', 'AL', 'MS', 'GA', 'FL'],
+        // Light Green - Western
+        western: ['WA', 'OR', 'CA', 'NV', 'ID', 'MT', 'WY', 'CO', 'AZ', 'UT', 'AK', 'HI'],
+        // Gray - Plains/Central
+        plains: ['ND', 'SD', 'NE', 'IA', 'MN', 'IL', 'WI']
+      };
+      
+      const colors = {
+        northeast: '#2c3e50',     // Dark blue/navy
+        southeast: '#c0392b',     // Red
+        southcentral: '#16a085',  // Teal/dark green
+        western: '#27ae60',       // Light green
+        plains: '#95a5a6'         // Gray
+      };
+      
+      // Find which region the state belongs to
+      for (const [region, states] of Object.entries(regions)) {
+        if (states.includes(stateId)) {
+          return colors[region];
+        }
+      }
+      
+      // Default color if state not found
+      return '#d3d3d3';
+    }
+    
+    function getHoverColor(stateId) {
+      // Darker hover colors for each region
+      const regions = {
+        northeast: ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA', 'DE', 'MD'],
+        southeast: ['VA', 'WV', 'KY', 'TN', 'NC', 'SC', 'OH', 'IN', 'IL', 'MI', 'WI'],
+        southcentral: ['TX', 'AR', 'LA', 'OK', 'MO', 'AL', 'MS', 'GA', 'FL'],
+        western: ['WA', 'OR', 'CA', 'NV', 'ID', 'MT', 'WY', 'CO', 'AZ', 'UT', 'AK', 'HI'],
+        plains: ['ND', 'SD', 'NE', 'KS', 'IA', 'MN']
+      };
+      
+      const hoverColors = {
+        northeast: '#1a252f',     // Darker navy
+        southeast: '#a93226',     // Darker red
+        southcentral: '#138d75',  // Darker teal
+        western: '#229954',       // Darker green
+        plains: '#7f8c8d'         // Darker gray
+      };
+      
+      // Find which region the state belongs to
+      for (const [region, states] of Object.entries(regions)) {
+        if (states.includes(stateId)) {
+          return hoverColors[region];
+        }
+      }
+      
+      // Default hover color if state not found
+      return '#999999';
     }
     
     function loadFallbackSVG() {
