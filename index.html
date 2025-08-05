@@ -87,27 +87,86 @@
   </div>
 
   <script>
-    // Load the SVG content
+    // ==============================================
+    // REGIONAL CONFIGURATION
+    // ==============================================
+    
+    // Regional mapping - single source of truth
+    const REGIONAL_MAPPING = {
+      // Dark Blue/Navy - Northeast
+      northeast: ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA', 'DE', 'MD'],
+      // Red - Southeast/Great Lakes
+      southeast: ['VA', 'WV', 'KY', 'TN', 'NC', 'SC', 'OH', 'IN', 'IL', 'MI', 'WI'],
+      // Teal/Dark Green - South Central
+      southcentral: ['TX', 'AR', 'LA', 'OK', 'MO', 'AL', 'MS', 'GA', 'FL'],
+      // Light Green - Western
+      western: ['WA', 'OR', 'CA', 'NV', 'ID', 'MT', 'WY', 'CO', 'AZ', 'NM', 'UT', 'AK', 'HI'],
+      // Gray - Plains/Central
+      plains: ['ND', 'SD', 'NE', 'KS', 'IA', 'MN']
+    };
+
+    const REGIONAL_COLORS = {
+      northeast: '#2c3e50',     // Dark blue/navy
+      southeast: '#c0392b',     // Red
+      southcentral: '#16a085',  // Teal/dark green
+      western: '#27ae60',       // Light green
+      plains: '#95a5a6'         // Gray
+    };
+
+    const REGIONAL_HOVER_COLORS = {
+      northeast: '#1a252f',     // Darker navy
+      southeast: '#a93226',     // Darker red
+      southcentral: '#138d75',  // Darker teal
+      western: '#229954',       // Darker green
+      plains: '#7f8c8d'         // Darker gray
+    };
+
+    // ==============================================
+    // INITIALIZATION
+    // ==============================================
+
+    // Load the SVG content and initialize the map
     fetch('./labels_us_map.svg')
       .then(response => response.text())
       .then(svgContent => {
-        // Insert SVG into the container
         document.getElementById('map-container').innerHTML = svgContent;
-        
-        // Add interactivity to the map
         addMapInteractivity();
       })
       .catch(error => {
         console.error('Error loading SVG:', error);
-        // Fallback: embed the SVG content directly
         loadFallbackSVG();
       });
 
+    // ==============================================
+    // UTILITY FUNCTIONS
+    // ==============================================
+
+    // ==============================================
+    // MAIN FUNCTIONALITY
+    // ==============================================
+
+    function getRegionForState(stateId) {
+      for (const [region, states] of Object.entries(REGIONAL_MAPPING)) {
+        if (states.includes(stateId)) {
+          return region;
+        }
+      }
+      return null;
+    }
+
+    function getRegionalColor(stateId) {
+      const region = getRegionForState(stateId);
+      return region ? REGIONAL_COLORS[region] : '#d3d3d3';
+    }
+    
+    function getHoverColor(stateId) {
+      const region = getRegionForState(stateId);
+      return region ? REGIONAL_HOVER_COLORS[region] : '#999999';
+    }
+
     function addMapInteractivity() {
-      // Get all state boundary paths
       const states = document.querySelectorAll('.boundary');
       
-      // Ensure proper text centering
       enhanceTextCentering();
       
       // Add state-group class to all state groups and apply regional colors
@@ -184,69 +243,6 @@
           tspan.setAttribute('dominant-baseline', 'central');
         });
       });
-    }
-    
-    function getRegionalColor(stateId) {
-      // Regional color mapping based on the provided image
-      const regions = {
-        // Dark Blue/Navy - Northeast
-        northeast: ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA', 'DE', 'MD'],
-        // Red - Southeast/Great Lakes
-        southeast: ['VA', 'WV', 'KY', 'TN', 'NC', 'SC', 'OH', 'IN', 'IL', 'MI', 'WI'],
-        // Teal/Dark Green - South Central
-        southcentral: ['TX', 'AR', 'LA', 'OK', 'MO', 'AL', 'MS', 'GA', 'FL'],
-        // Light Green - Western
-        western: ['WA', 'OR', 'CA', 'NV', 'ID', 'MT', 'WY', 'CO', 'AZ', 'NM', 'UT', 'AK', 'HI'],
-        // Gray - Plains/Central
-        plains: ['ND', 'SD', 'NE', 'KS', 'IA', 'MN']
-      };
-      
-      const colors = {
-        northeast: '#2c3e50',     // Dark blue/navy
-        southeast: '#c0392b',     // Red
-        southcentral: '#16a085',  // Teal/dark green
-        western: '#27ae60',       // Light green
-        plains: '#95a5a6'         // Gray
-      };
-      
-      // Find which region the state belongs to
-      for (const [region, states] of Object.entries(regions)) {
-        if (states.includes(stateId)) {
-          return colors[region];
-        }
-      }
-      
-      // Default color if state not found
-      return '#d3d3d3';
-    }
-    
-    function getHoverColor(stateId) {
-      // Darker hover colors for each region
-      const regions = {
-        northeast: ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA', 'DE', 'MD'],
-        southeast: ['VA', 'WV', 'KY', 'TN', 'NC', 'SC', 'OH', 'IN', 'IL', 'MI', 'WI'],
-        southcentral: ['TX', 'AR', 'LA', 'OK', 'MO', 'AL', 'MS', 'GA', 'FL'],
-        western: ['WA', 'OR', 'CA', 'NV', 'ID', 'MT', 'WY', 'CO', 'AZ', 'NM', 'UT', 'AK', 'HI'],
-        plains: ['ND', 'SD', 'NE', 'KS', 'IA', 'MN']
-      };
-      
-      const hoverColors = {
-        northeast: '#1a252f',     // Darker navy
-        southeast: '#a93226',     // Darker red
-        southcentral: '#138d75',  // Darker teal
-        western: '#229954',       // Darker green
-        plains: '#7f8c8d'         // Darker gray
-      };
-      
-      // Find which region the state belongs to
-      for (const [region, states] of Object.entries(regions)) {
-        if (states.includes(stateId)) {
-          return hoverColors[region];
-        }
-      }
-      
-      // Default hover color if state not found
-      return '#999999';
     }
     
     function loadFallbackSVG() {
