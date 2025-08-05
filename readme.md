@@ -22,6 +22,25 @@ An interactive US map with regional color coding and hover effects. Built with m
 
 Simply open `index.html` in a web browser. The map will load with regional colors applied and interactive features enabled.
 
+## Integration
+
+To add this map to another HTML file or application:
+
+- **📖 [INTEGRATION.md](INTEGRATION.md)** - Complete integration guide with code examples
+- **⚡ [QUICK-REFERENCE.md](QUICK-REFERENCE.md)** - Minimal setup and common patterns
+- **🎯 [index.html](index.html)** - Reference implementation
+
+### Quick Start
+```html
+<div id="map-container"></div>
+<script src="us-map-component.js"></script>
+<script>
+  new USMapComponent('map-container', 'path/to/labels_us_map.svg');
+</script>
+```
+
+See the integration documentation for complete setup instructions.
+
 ## Files
 
 - `index.html` - Main interactive map application

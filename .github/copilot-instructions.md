@@ -1,20 +1,63 @@
 
 ## Architecture Overview
 
-### Frontend (`packages/frontend/`)
-- Placeholder for frontend code, currently empty
+### US Map Component Structure
+```
+us-map-raphael/
+├── index.html           # Standalone demo implementation
+├── labels_us_map.svg    # SVG map data with state boundaries and labels  
+├── INTEGRATION.md       # Comprehensive integration documentation
+├── readme.md           # Basic usage and feature overview
+└── us-map-svg.js       # Legacy Raphael.js path data (reference only)
+```
 
-### Backend 
-- Placeholder for backend code, currently empty
+### Component Architecture
+- **Pure vanilla JavaScript** - No external dependencies
+- **SVG-based rendering** - Scalable and performant
+- **Regional color mapping** - 5 distinct geographic regions
+- **Event-driven interactions** - Hover effects and click handlers
+- **Responsive design** - Adapts to container constraints
 
 ## Critical Data Flow Patterns
-- placeholder for critical data flow patterns, currently empty
 
-### Job Sync Architecture
-- Placeholder
+### Component Lifecycle
+1. **Initialization** - Fetch SVG content from file system
+2. **DOM Injection** - Insert SVG into designated container
+3. **Event Registration** - Attach hover/click handlers to state boundaries
+4. **Color Application** - Apply regional colors based on state mapping
+5. **Interactive State** - Respond to user interactions with visual feedback
+
+### State Management Flow
+```
+State ID → Regional Mapping Lookup → Color Assignment → Event Binding → User Interaction → Callback Execution
+```
+
+### Data Dependencies
+- **REGIONAL_MAPPING**: Object mapping regions to state arrays
+- **REGIONAL_COLORS**: Base colors for each geographic region  
+- **REGIONAL_HOVER_COLORS**: Darker variants for hover states
+- **SVG Content**: External file loaded via fetch API
 
 ## Project-Specific Patterns
-- Placeholder
+
+### Regional Grouping System
+- **Northeast** (Dark Blue): New England + Mid-Atlantic states
+- **Southeast** (Red): Southern states + Great Lakes region  
+- **South Central** (Teal): Texas, Louisiana, Arkansas, Oklahoma + surrounding
+- **Western** (Green): Pacific, Mountain, Southwest states + Alaska/Hawaii
+- **Plains** (Gray): Upper Midwest agricultural/plains states
+
+### Color Consistency Rules
+- Each region has primary color + darker hover variant
+- Default fallback: `#d3d3d3` (light gray) for unmapped states
+- Hover fallback: `#999999` (medium gray)
+- All colors follow accessibility contrast guidelines
+
+### File Organization Principles
+- **Single source of truth** for regional mappings
+- **Separation of concerns** - CSS, JavaScript, and SVG content isolated
+- **Integration flexibility** - Component can be embedded in any HTML page
+- **No build process required** - Runs directly in browser
 
 
 # Development Partnership
