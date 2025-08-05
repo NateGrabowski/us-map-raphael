@@ -5,7 +5,7 @@
 ```
 us-map-raphael/
 ├── index.html           # Standalone demo implementation
-├── labels_us_map.svg    # SVG map data with state boundaries and labels  
+├── rise-map-csacolors.svg    # SVG map data with state boundaries and regional colors  
 ├── INTEGRATION.md       # Comprehensive integration documentation
 ├── readme.md           # Basic usage and feature overview
 └── us-map-svg.js       # Legacy Raphael.js path data (reference only)
